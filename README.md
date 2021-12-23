@@ -1,1 +1,0 @@
-# Receptor_dependence

@@ -1,0 +1,14 @@
+﻿virus_label,cell_label,observed
+SARS-CoV-2 RBD,H.sapiens,yes
+SARS-CoV,H.sapiens,yes
+Rp3 RBD,R.pearsonii,yes
+Rs4237 RBD,R.sinicus472,yes
+Rs4237 RBD,R.sinicus200,yes
+Rs4237 RBD,R.sinicus215,yes
+YN2013 RBD,R.sinicus472,yes
+YN2013 RBD,R.sinicus200,yes
+YN2013 RBD,R.sinicus215,yes
+Khosta1 RBD,R.ferrumequinum,yes
+WIV1 RBD,R.sinicus472,yes
+WIV1 RBD,R.sinicus200,yes
+WIV1 RBD,R.sinicus215,yes

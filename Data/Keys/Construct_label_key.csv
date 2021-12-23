@@ -4,3 +4,27 @@ None,None,yes
 G758A,ACE2(dEcto),yes
 G752A,ACE2,yes
 G828A,ACE2-TMPRSS2,yes
+G852C/G758A,H.sapiens,no
+G988A/G758A,R.alcyone,no
+G1001B/G758A,NULL (fs),no
+G975C/G758A,R.sinicus215,no
+G987A/G758A,R.affinis,no
+G999D/G758A,R.landeri,no
+G973A/G758A,R.sinicus472,no
+G974D/G758A,R.sinicus200,no
+G1080J/G758A,KAM3770(ferrum),no
+G1001B,NULL (fs),no
+G852C,H.sapiens,no
+G973A,R.sinicus472,no
+G974D,R.sinicus200,no
+G975C,R.sinicus215,no
+G987A,R.affinis,no
+G988A,R.alcyone,no
+G999D,R.landeri,no
+G1087L,R.ferrumequinum,no
+G1118A,R.pearsonii,no
+G1111B,K31D,no
+G1112C,Y41A,no
+G1113C,K353D,no
+G1114D,D355N,no
+G1115G,R357T,no

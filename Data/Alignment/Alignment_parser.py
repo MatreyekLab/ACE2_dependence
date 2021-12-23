@@ -20,13 +20,13 @@ for col in range(aln.get_alignment_length()):  # search into column
         break
 #print(aln[:,position::])
 #alignment = aln[:,position::]
-alignment = aln[:,position:position+600]
+alignment = aln[:,position:position+1000]
 print(alignment.format("fasta"))
 
 
 ## Now write into another fasta file
 #input_handle = open("example.phy", "rU")
-output_handle = open(input_file[:-4]+"_Trimmed.fasta", "w")
+output_handle = open(input_file[:-4]+"_aligned.fasta", "w")
 
 #alignments = AlignIO.parse(input_handle, "phylip")
 AlignIO.write(alignment, output_handle, "fasta")
