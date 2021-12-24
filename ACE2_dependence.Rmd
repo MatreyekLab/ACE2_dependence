@@ -2,7 +2,7 @@
 title: "ACE2_dependence"
 author: "Kenneth Matreyek"
 date: "1/12/2021"
-output: html_document
+output: github_document
 ---
 
 ```{r Set up the analysis script}
@@ -182,7 +182,7 @@ receptors_grouped_summary <- receptors_grouped %>% group_by(receptor_grouped, vi
 
 ```
 
-```{r Using a combination of mCherry and iRFP670 to test which proteins help enhance SARS1 or SARS2 pseudovirus entry}
+```{r Comparing the HA-tagged and untagged formats}
 
 receptors_virus_label_levels <- c("VSV", "SARS-CoV", "SARS-CoV-2")
 receptors_grouped <- receptors_grouped %>% filter(virus_label %in% receptors_virus_label_levels)
@@ -524,7 +524,6 @@ colnames(ace2_with_tmprss2_controls) <- c("virus_label","ace2","ace2tmprss2")
 ## Weird. Maybe the values were maxed out or something?
 ```
 
-
 ```{r Looking at the RBD panel with ACE2 and TMPRSS2}
 
 two_color_ace2_tmprss2_dep2_rbds <- two_color_ace2_tmprss2_dep2 %>% filter(virus_label %in% rbd_label_levels)
@@ -552,7 +551,7 @@ two_color_ace2_tmprss2_dep_summary_rbds$cells <- "ACE2-2A-TMPRSS2"
 
 ```
 
-```{r Looking at the RBD panel with ACE2 and TMPRSS2}
+```{r Comparing the RBD panel data with ACE2 only or ACE2 and TMPRSS2}
 
 rbds_both_dataset <- rbind(rbd_subset2[,c("virus_label","cells","dep_infection")], two_color_ace2_tmprss2_dep2_rbds[,c("virus_label","cells","dep_infection")])
 
@@ -883,10 +882,9 @@ ggsave(file = "Plots/Ace2_differences_linear_seq_plot_for_presentation.pdf", Ace
 
 
 paste("select ace2_most_variants, ace2 and resi",gsub(", ","+",toString(subset(df_amino_acid_matrix, differences >= 4)$position)))
-```
 
 
-```{r Figuring out the most variable positions in rhinolophid ACE2}
+
 five_changed_positions <- df_amino_acid_matrix %>% filter(differences == 5)
 paste("select five_differences, ace2 and resi",gsub(", ","+",toString(unlist(five_changed_positions$position))))
 paste("color forest, five_differences")
