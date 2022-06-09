@@ -33,7 +33,7 @@ virus_colors <- c("VSV" = "red", "SARS-CoV" = "darkgreen", "SARS-CoV-2" = "blue"
 
 ```{r Import the flow data as well as relevant samples keys}
 
-combined_infection <- read.csv(file = "Supp_tables/Supplementary_Table_2.csv")
+combined_infection <- read.csv(file = "Supp_tables/S2_Table.csv")
 
 recombined_construct_key <- read.csv(file = "Data/Keys/Construct_label_key.csv", header = T, stringsAsFactors = F)
 pseudovirus_label_key <- read.csv(file = "Data/Keys/Pseudovirus_label_key.csv", header = T, stringsAsFactors = F) #%>% filter(sequence_confirmed != "no")
@@ -440,7 +440,7 @@ Clade_difference_plot
 ```
 
 ```{r Disulfides}
-supptable <- read.csv(file = "Supp_tables/Supplementary_Table_1.csv") %>% filter(cys != 1 & clade != 5)
+supptable <- read.csv(file = "Supp_tables/S1_Table.csv") %>% filter(cys != 1 & clade != 5)
 
 #supptable2 <- merge(supptable[,c("name","cys")], clade_labels_key, by = "name")
 
