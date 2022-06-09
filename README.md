@@ -1,4 +1,4 @@
-ACE2\_dependence
+ACE2_dependence
 ================
 Kenneth Matreyek
 1/12/2021
@@ -14,9 +14,9 @@ library(tidyverse)
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 
     ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.5     ✓ dplyr   1.0.7
-    ## ✓ tidyr   1.1.4     ✓ stringr 1.4.0
-    ## ✓ readr   2.0.2     ✓ forcats 0.5.1
+    ## ✓ tibble  3.1.6     ✓ dplyr   1.0.7
+    ## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+    ## ✓ readr   2.1.2     ✓ forcats 0.5.1
 
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
@@ -43,7 +43,7 @@ library(reshape)
 library(sf)
 ```
 
-    ## Linking to GEOS 3.8.1, GDAL 3.2.1, PROJ 7.2.1
+    ## Linking to GEOS 3.9.1, GDAL 3.2.3, PROJ 7.2.1; sf_use_s2() is TRUE
 
 ``` r
 library(here)
@@ -66,7 +66,7 @@ virus_colors <- c("VSV" = "red", "SARS-CoV" = "darkgreen", "SARS-CoV-2" = "blue"
 ```
 
 ``` r
-combined_infection <- read.csv(file = "Data/Receptor_dependence_data.csv")
+combined_infection <- read.csv(file = "Supp_tables/Supplementary_Table_2.csv")
 
 recombined_construct_key <- read.csv(file = "Data/Keys/Construct_label_key.csv", header = T, stringsAsFactors = F)
 pseudovirus_label_key <- read.csv(file = "Data/Keys/Pseudovirus_label_key.csv", header = T, stringsAsFactors = F) #%>% filter(sequence_confirmed != "no")
@@ -76,7 +76,7 @@ clade_labels_key$clade = factor(clade_labels_key$clade, levels = c(1,2,3,4))
 
 ``` r
 # Two-color data
-two_color_precombined <- combined_infection %>% filter(expt %in% c("Two_color", "Receptors", "ACE2_TMPRSS2", "Two_color_ACE2_TMPRSS2", "Mixed_cell_infection", "Btky72_ACE2muts", "Bat_ACE2s","LSign_RBD_panel","Clade3_hum_muts","ACE2_muts") & !(is.na(pseudovirus_env) | pseudovirus_env == "None") & live_singlets != "Too few infected")
+two_color_precombined <- combined_infection %>% filter(expt %in% c("Two_color", "Receptors", "ACE2_TMPRSS2", "Two_color_ACE2_TMPRSS2", "Mixed_cell_infection", "Btky72_ACE2muts", "Bat_ACE2s","LSign_RBD_panel","Clade3_hum_muts","ACE2_muts","Q493_muts","New_constructs","Full_length") & !(is.na(pseudovirus_env) | pseudovirus_env == "None") & live_singlets != "Too few infected") %>% filter(!is.na(pct_grn_gvn_red))
 
 ## Make sure I ignore data where I didn't run enough cells to make a conclusion
 two_color_precombined$live_singlets <- as.numeric(two_color_precombined$live_singlets)
@@ -198,7 +198,7 @@ ggsave(file = "Plots/Mixed_cell_cv.pdf", Mixed_cell_cv, height = 1, width = 4)
 ## Seeing which receptors or proposed receptors actually enhance SARS-CoV-2 pseudovirus entry when overexpressed in HEK cells
 
 ``` r
-receptors <- two_color_combined %>% filter(expt == "Receptors" & recombined_construct != "CD209")
+receptors <- two_color_combined %>% filter(expt == "Receptors" & recombined_construct != "CD209" & pseudovirus_env != "G778B")
 receptors$log10_nir_red_diff <- log10(receptors$moi_gvn_nir) - log10(receptors$moi_gvn_red)
 
 ## Collapsing all proteins to a single group, regardless of the tag
@@ -214,10 +214,6 @@ receptors_grouped_summary <- receptors_grouped %>% group_by(receptor_grouped, vi
   summarize(mean_log10_nir_red_diff = mean(log10_nir_red_diff), sd_log10_nir_red_diff = sd(log10_nir_red_diff), n = sum(n), .groups = "drop") %>% 
   mutate(se_log10_nir_red_diff = sd_log10_nir_red_diff / sqrt(n), geomean = 10^mean_log10_nir_red_diff, lower_ci = 10^(mean_log10_nir_red_diff - se_log10_nir_red_diff * qt(p=0.05/2, df=n-1,lower.tail=F)), upper_ci = 10^(mean_log10_nir_red_diff + se_log10_nir_red_diff * qt(p=0.05/2, df=n-1,lower.tail=F)))
 ```
-
-    ## Warning in qt(p = 0.05/2, df = n - 1, lower.tail = F): NaNs produced
-
-    ## Warning in qt(p = 0.05/2, df = n - 1, lower.tail = F): NaNs produced
 
 ``` r
 receptors_virus_label_levels <- c("VSV", "SARS-CoV", "SARS-CoV-2")
@@ -528,6 +524,28 @@ Clade_difference_plot
 
 ![](ACE2_dependence_files/figure-gfm/Clade-wise%20differences%20in%20RBD%20sequences-1.png)<!-- -->
 
+``` r
+supptable <- read.csv(file = "Supp_tables/Supplementary_Table_1.csv") %>% filter(cys != 1 & clade != 5)
+
+#supptable2 <- merge(supptable[,c("name","cys")], clade_labels_key, by = "name")
+
+clade_cys_table <- data.frame(table(supptable[,c("cys","clade")]))
+
+clade_cys_table$cys = factor(clade_cys_table$cys, levels = c(2,0))
+
+Cysteine_plot <- ggplot() + labs(x = "Clade", y = "Cysteines") +
+  scale_fill_gradient(low = "white", high = "red") + 
+  geom_tile(data = clade_cys_table, aes(x = clade, y = cys, fill = Freq)) +
+  geom_text(data = clade_cys_table, aes(x = clade, y = cys, label = Freq))
+Cysteine_plot
+```
+
+![](ACE2_dependence_files/figure-gfm/Disulfides-1.png)<!-- -->
+
+``` r
+ggsave(file = "Plots/Cysteine_plot.pdf", Cysteine_plot, height = 0.9, width = 2)
+```
+
 ## Now looking at infection data with the panel of RBDs
 
 ``` r
@@ -777,8 +795,8 @@ ACE2_TMPRSS2_btky72_plot
 ![](ACE2_dependence_files/figure-gfm/Looking%20at%20the%20BtKY72%20panel%20with%20ACE2%20and%20TMPRSS2-1.png)<!-- -->
 
 ``` r
-ggsave(file = "Plots/ACE2_TMPRSS2_btky72_plot.pdf", ACE2_TMPRSS2_btky72_plot, height = 2, width = 4)
-ggsave(file = "Plots/ACE2_TMPRSS2_btky72_plot.png", ACE2_TMPRSS2_btky72_plot, height = 2, width = 4)
+ggsave(file = "Plots/ACE2_TMPRSS2_btky72_plot.pdf", ACE2_TMPRSS2_btky72_plot, height = 2, width = 3.5)
+ggsave(file = "Plots/ACE2_TMPRSS2_btky72_plot.png", ACE2_TMPRSS2_btky72_plot, height = 2, width = 3.5)
 
 two_color_ace2_dep_summary_btky72_segments <- two_color_ace2_dep_summary %>% filter(virus_label %in% c("Junin virus", "BtKY72 RBD", "BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955","BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955", "BtKY72 1-120;329-539", "BtKY72 112-206;329-539", "BtKY72 214-328;329-539"))
 two_color_ace2_tmprss2_dep_summary_btky72_segments <- two_color_ace2_tmprss2_dep_summary %>% filter(virus_label %in% c("Junin virus", "BtKY72 RBD", "BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955","BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955", "BtKY72 1-120;329-539", "BtKY72 112-206;329-539", "BtKY72 214-328;329-539"))
@@ -1042,19 +1060,6 @@ all_ace2_identity_matrix_plot
 
 ![](ACE2_dependence_files/figure-gfm/Looking%20at%20all%20of%20the%20bat%20ACE2s%20in%20NCBI-1.png)<!-- -->
 
-``` r
-all_ace2_identity_matrix_plot <- ggplot() + theme_bw() +
-  theme(axis.text = element_text(size = 8), axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5)) +
-  labs(x = NULL, y = NULL, fill = NULL) +
-  scale_fill_continuous(low = "white", high = "black") +
-  geom_tile(data = all_ace2_dist_melted, aes(x = species, y = variable, fill = value)) +
-  #geom_text(data = all_ace2_dist_melted %>% filter(species != "H.sapiens" & variable != "H.sapiens" & value <= 80), aes(x = species, y = variable, label = value), size = 2) +
-  #geom_text(data = all_ace2_dist_melted %>% filter(species != "H.sapiens" & variable != "H.sapiens" & value >= 80), aes(x = species, y = variable, label = value), size = 2, color = "grey70") +
-  NULL
-ggsave(file = "Plots/all_ace2_identity_matrix_plot_no_numbers_for_presentation.pdf", all_ace2_identity_matrix_plot, height = 6, width = 7)
-#all_ace2_identity_matrix_plot
-```
-
 ## See if I can plot where the most changes in sequence are
 
 ``` r
@@ -1102,7 +1107,6 @@ Ace2_differences_linear_seq_plot
 ggsave(file = "Plots/Ace2_differences_linear_seq_plot.pdf", Ace2_differences_linear_seq_plot, height = 1.5, width = 2.25)
 ggsave(file = "Plots/Ace2_differences_linear_seq_plot_for_presentation.pdf", Ace2_differences_linear_seq_plot, height = 2, width = 5)
 
-
 paste("select ace2_most_variants, ace2 and resi",gsub(", ","+",toString(subset(df_amino_acid_matrix, differences >= 4)$position)))
 ```
 
@@ -1149,7 +1153,6 @@ paste("color yellow, three_differences")
 
 ``` r
 ## Figure out which positions differ between alcyone and landeri
-
 alcyone_landeri_frame <- df_amino_acid_matrix[,c("R.alcyone","R.landeri")]
 for(x in 1:nrow(alcyone_landeri_frame)){alcyone_landeri_frame$unique_residue[x] <- gsub("[^A-Z]","",toString(unique(unlist(alcyone_landeri_frame[x,1:2]))))}
 alcyone_landeri_frame$amino_acids <- nchar(alcyone_landeri_frame$unique_residue)
@@ -1178,22 +1181,48 @@ paste("select alcyone_diffs, obj_human and resi",gsub(", ","+",toString(unlist(a
 
     ## [1] "select alcyone_diffs, obj_human and resi 15+27+31+35+41+246+286+613+656+720"
 
-For Pymol, this is the original view I was taking: set\_view (  
--0.749005258, 0.309185177, 0.585980117,  
-0.508651137, -0.298377454, 0.807608724,  
-0.424550295, 0.902970016, 0.066217214,  
--0.000023350, -0.004991800, -140.967224121,  
-170.430801392, 103.793731689, 248.385269165,  
-21.847066879, 256.336883545, -20.000000000 )
+## Bringing in some of the Amnis data
 
-But perhaps it will be good to use this other view for looking at the
-interaction surface set\_view (  
--0.721982539, -0.174140140, 0.669620097,  
-0.527815580, -0.764368415, 0.370321423,  
-0.447354764, 0.620808363, 0.643779159,  
-0.000628673, -0.003673134, -141.278152466,  
-168.149459839, 108.284217834, 245.709442139,  
-21.847066879, 256.336883545, -20.000000000 )
+### Note: The data is way to big to uplaod to GitHub, so I’m only including a snippet here showing how it generally works
+
+``` r
+af488_data <- read.table(file = "Data/Amnis/af488_distance_intensity.txt", sep = "\t", header = T) %>% mutate(n = 1)
+mirfp670_data <- read.table(file = "Data/Amnis/miRFP670_distance_intensity.txt", sep = "\t", header = T) %>% mutate(n = 1)
+bf_data <- read.table(file = "Data/Amnis/bf_distance_intensity.txt", sep = "\t", header = T) %>% mutate(n = 1)
+
+af488_summary <- af488_data %>% group_by(distance) %>% summarize(fraction_intensity = sum(fraction_intensity), n = sum(n)) %>% mutate(norm_intensity = fraction_intensity / n)
+mirfp670_summary <- mirfp670_data %>% group_by(distance) %>% summarize(fraction_intensity = sum(fraction_intensity), n = sum(n)) %>% mutate(norm_intensity = fraction_intensity / n)
+bf_summary <- bf_data %>% group_by(distance) %>% summarize(fraction_intensity = sum(fraction_intensity), n = sum(n)) %>% mutate(norm_intensity = fraction_intensity / n)
+
+af488_summary$fraction_mode <- af488_summary$norm_intensity/max(af488_summary$norm_intensity)
+mirfp670_summary$fraction_mode <- mirfp670_summary$norm_intensity/max(mirfp670_summary$norm_intensity)
+bf_summary$fraction_mode <- bf_summary$norm_intensity/max(bf_summary$norm_intensity)
+
+bf_summary2 <- bf_summary %>% filter(distance <= 25)
+bf_summary2$fraction_mode <- (bf_summary2$fraction_mode - min(bf_summary2$fraction_mode))/(max(bf_summary2$fraction_mode) - min(bf_summary2$fraction_mode))
+
+Export_250_plot <- ggplot() + theme(panel.grid.minor = element_blank()) + 
+  labs(x = "Distance from cell center", y = "Normalized pixel intensity") +
+  scale_x_continuous(limits = c(0,25)) + 
+  geom_line(data = bf_summary2, aes(x = distance, y = fraction_mode), alpha = 0.4, color = "black", size = 2) +
+  geom_point(data = bf_summary2, aes(x = distance, y = fraction_mode), alpha = 1, color = "black") +
+  geom_line(data = mirfp670_summary, aes(x = distance, y = fraction_mode), alpha = 0.4, color = "red", size = 2) +
+  geom_point(data = mirfp670_summary, aes(x = distance, y = fraction_mode), alpha = 1, color = "red") +
+  geom_line(data = af488_summary, aes(x = distance, y = fraction_mode), alpha = 0.4, color = "green3", size = 2) +
+  geom_point(data = af488_summary, aes(x = distance, y = fraction_mode), alpha = 1, color = "green3")
+Export_250_plot
+```
+
+![](ACE2_dependence_files/figure-gfm/Amnis-1.png)<!-- -->
+
+``` r
+ggsave(file = "Export_250_plot.pdf", Export_250_plot, height = 2.2, width = 2.5)
+
+amnis_cell_numbers <- c(1528,1310,1050,565,980,1121,1052,987,1178,1555)
+sum(amnis_cell_numbers)
+```
+
+    ## [1] 11326
 
 ``` r
 rbd_label_levels2 <- c("VSV","YN2013 RBD", "Rs4237 RBD", "Rp3 RBD", "SARS-CoV-2","SARS-CoV-2 RBD", "SARS-CoV", "WIV1 RBD", "RhGB01 RBD", "BB9904 RBD", "BM48-31 RBD", "Khosta2 RBD", "Khosta1 RBD", "BtKY72 RBD")
@@ -1351,11 +1380,11 @@ microscope_summary2 <- microscopy_batace2_summary %>% filter(cell_label != "NULL
 flow_micro_summary2 <- merge(flow_summary2, microscope_summary2, by = "cell_label")
 
 grouped_by_cell_plot <- ggplot() + theme(panel.grid.minor = element_blank()) + 
-  scale_x_log10(limits = c(0.4,30)) + scale_y_log10(limits = c(0.8,4.2)) + 
+  scale_x_log10(limits = c(0.4,30)) + scale_y_log10(limits = c(1,4.2)) + 
   labs(x = "Flow cytometry", y = "Microscopy") + 
   geom_text_repel(data = flow_micro_summary2, aes(x = mean_flow, y = mean_micro, label = cell_label), color = "red", size = 2, segment.color = "orange", segment.alpha = 0.4) +
   geom_point(data = flow_micro_summary2, aes(x = mean_flow, y = mean_micro), alpha = 0.5)
-ggsave(file = "Plots/Grouped_by_cell_plot.pdf", grouped_by_cell_plot, height = 2, width = 2.75)
+ggsave(file = "Plots/Grouped_by_cell_plot.pdf", grouped_by_cell_plot, height = 1.5, width = 2.75)
 ```
 
 ``` r
@@ -1412,6 +1441,126 @@ Clade3_scatterplot
 
 ![](ACE2_dependence_files/figure-gfm/Directly%20compare%20the%20microscopy%20and%20flow%20data%20for%20the%20Bat%20ACE2%20orthologs%20and-4.png)<!-- -->
 
+## This is where we test the full-length BtKY72 and Khosta-2 spikes
+
+``` r
+full_length <- two_color_precombined %>% filter(expt %in% c("Full_length") & pseudovirus_env != "R12")
+
+full_length$red_cells <- full_length$live_singlets * full_length$pct_red / 100
+full_length$red_then_grn_cells <- round(full_length$red_cells * full_length$pct_grn_gvn_red / 100,0)
+full_length$nir_cells <- full_length$live_singlets * full_length$pct_nir / 100
+full_length$nir_then_grn_cells <- round(full_length$nir_cells * full_length$pct_grn_gvn_nir / 100,0)
+
+# Foregoing this -> #passes_lower_bound == "yes" & 
+full_length_1 <- full_length %>% filter(nir_then_grn_cells > 1) %>% group_by(recombined_construct, pseudovirus_env) %>% mutate(pct_grn_gvn_red = red_then_grn_cells / red_cells * 100, pct_grn_gvn_nir = nir_then_grn_cells / nir_cells * 100) %>% mutate(moi_gvn_red = -log(1-pct_grn_gvn_red/100), moi_gvn_nir = -log(1-pct_grn_gvn_nir/100))
+
+full_length_1$log10_nir_red_diff <- log10(full_length_1$moi_gvn_nir) - log10(full_length_1$moi_gvn_red)
+full_length_1$fold_ace2_dep_infection <- 10^full_length_1$log10_nir_red_diff
+full_length_1 <- full_length_1 %>% filter(log10_nir_red_diff != "Inf" & log10_nir_red_diff != "-Inf" & pseudovirus_env != "G1271A")
+
+full_length_2 <- merge(full_length_1, pseudovirus_label_key, by = "pseudovirus_env")
+full_length_2 <- merge(full_length_2, recombined_construct_key, by = "recombined_construct")
+
+full_length_2$log10_nir_red_diff <- log10(full_length_2$moi_gvn_nir) - log10(full_length_2$moi_gvn_red)
+full_length_2$fold_ace2_dep_infection <- 10^full_length_2$log10_nir_red_diff
+
+full_length_summary <- full_length_2 %>% filter(!(fold_ace2_dep_infection %in% c(NaN,0,Inf))) %>% group_by(cell_label, parent_rbd, interface_res) %>% summarize(ratio = 10^(mean(log10(fold_ace2_dep_infection))), .groups = "drop")
+
+full_length_2$type <- "full_length"
+
+chimerics <-two_color_precombined %>% filter(expt != "Full_length")
+
+chimerics_1 <- chimerics %>% group_by(recombined_construct, pseudovirus_env) %>% mutate(moi_gvn_red = -log(1-pct_grn_gvn_red/100), moi_gvn_nir = -log(1-pct_grn_gvn_nir/100))
+
+chimerics_1$log10_nir_red_diff <- log10(chimerics_1$moi_gvn_nir) - log10(chimerics_1$moi_gvn_red)
+chimerics_1$fold_ace2_dep_infection <- 10^chimerics_1$log10_nir_red_diff
+chimerics_1 <- chimerics_1 %>% filter(log10_nir_red_diff != "Inf" & log10_nir_red_diff != "-Inf" & pseudovirus_env != "G1271A")
+
+chimerics_2 <- merge(chimerics_1, pseudovirus_label_key, by = "pseudovirus_env")
+chimerics_2 <- merge(chimerics_2, recombined_construct_key, by = "recombined_construct")
+
+chimerics_2$log10_nir_red_diff <- log10(chimerics_2$moi_gvn_nir) - log10(chimerics_2$moi_gvn_red)
+chimerics_2$fold_ace2_dep_infection <- 10^chimerics_2$log10_nir_red_diff
+
+chimerics_3 <- chimerics_2 %>% filter(!(fold_ace2_dep_infection %in% c(NaN,0,Inf))) %>% filter(((parent_rbd == "BtKY72" & interface_res == "K") | (parent_rbd == "Khosta2" & interface_res == "Q")) & cell_label %in% c("H.sapiens","R.alcyone")) %>% mutate(type = "chimeric")
+
+vsvg <- full_length_2 %>% filter(pseudovirus_env == "VSVG")
+vsvg$type <- "full_length"
+
+columns_for_chimerics_full_length <- c("cell_label", "parent_rbd", "type","fold_ace2_dep_infection")
+
+chimerics_and_full_length <- rbind(chimerics_3[,columns_for_chimerics_full_length],
+                                   full_length_2[,columns_for_chimerics_full_length],
+                                   vsvg[,columns_for_chimerics_full_length]) %>% filter(parent_rbd != "SARS-CoV")
+
+chimerics_and_full_length_summary <- chimerics_and_full_length %>% group_by(cell_label, parent_rbd, type) %>% summarize(ratio = 10^(mean(log10(fold_ace2_dep_infection))), .groups = "drop")
+
+Full_length_plot2 <- ggplot() + theme(axis.text.x.bottom = element_text(angle = -90, hjust = 0, vjust = 0.5), panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), legend.position = "right") + 
+  labs(x = NULL, y = "Fold ACE2\n-dependent infection") + 
+  scale_y_log10() + 
+  geom_hline(yintercept = 1, size = 3, alpha = 0.2) +
+  geom_point(data = chimerics_and_full_length, aes(x = parent_rbd, y = fold_ace2_dep_infection, color = type),
+             position = position_dodge(width = 0.5), alpha = 0.2) +
+  geom_point(data = chimerics_and_full_length_summary, aes(y = ratio, x = parent_rbd, color = type), 
+             position = position_dodge(width = 0.5), shape = 95, size = 8) +
+  facet_grid(cols = vars(cell_label)) +
+  NULL
+Full_length_plot2
+```
+
+![](ACE2_dependence_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+
+``` r
+ggsave(file = "Plots/Full_length_plot2.pdf", Full_length_plot2, height = 1.7, width = 3.5)
+```
+
+``` r
+prdbtky <- two_color_precombined %>% filter(expt %in% c("Q493_muts"))
+
+prdbtky$red_cells <- prdbtky$live_singlets * prdbtky$pct_red / 100
+prdbtky$red_then_grn_cells <- round(prdbtky$red_cells * prdbtky$pct_grn_gvn_red / 100,0)
+prdbtky$nir_cells <- prdbtky$live_singlets * prdbtky$pct_nir / 100
+prdbtky$nir_then_grn_cells <- round(prdbtky$nir_cells * prdbtky$pct_grn_gvn_nir / 100,0)
+
+prdbtky_1 <- prdbtky %>% filter(passes_lower_bound == "yes" & nir_then_grn_cells > 5) %>% group_by(recombined_construct, pseudovirus_env) %>% mutate(pct_grn_gvn_red = red_then_grn_cells / red_cells * 100, pct_grn_gvn_nir = nir_then_grn_cells / nir_cells * 100) %>% mutate(moi_gvn_red = -log(1-pct_grn_gvn_red/100), moi_gvn_nir = -log(1-pct_grn_gvn_nir/100))
+
+prdbtky_1$log10_nir_red_diff <- log10(prdbtky_1$moi_gvn_nir) - log10(prdbtky_1$moi_gvn_red)
+prdbtky_1$fold_ace2_dep_infection <- 10^prdbtky_1$log10_nir_red_diff
+prdbtky_1 <- prdbtky_1 %>% filter(log10_nir_red_diff != "Inf" & log10_nir_red_diff != "-Inf")
+
+prdbtky_2 <- merge(prdbtky_1, pseudovirus_label_key, by = "pseudovirus_env")
+prdbtky_2 <- merge(prdbtky_2, recombined_construct_key, by = "recombined_construct")
+
+prdbtky_2$log10_nir_red_diff <- log10(prdbtky_2$moi_gvn_nir) - log10(prdbtky_2$moi_gvn_red)
+prdbtky_2$fold_ace2_dep_infection <- 10^prdbtky_2$log10_nir_red_diff
+
+flow_ace2_muts_summary <- prdbtky_2 %>% filter(!(fold_ace2_dep_infection %in% c(NaN,0,Inf))) %>% group_by(cell_label, parent_rbd, interface_res) %>% summarize(ratio = 10^(mean(log10(fold_ace2_dep_infection))), .groups = "drop")
+
+prd <- prdbtky_2 %>% filter(pseudovirus_env %in% c("G1279B","G1280A"))
+btky <- prdbtky_2 %>% filter(pseudovirus_env == "G1194G" & date %in% unique(prd$date))
+sars <- prdbtky_2 %>% filter(pseudovirus_env == "R12")
+vsvg <- prdbtky_2 %>% filter(pseudovirus_env == "VSVG")
+
+prd_btky <- rbind(prd,btky,sars,vsvg)
+
+prd_btky_summary <- prd_btky %>% filter(!(fold_ace2_dep_infection %in% c(NaN,0,Inf))) %>% group_by(cell_label, parent_rbd, interface_res) %>% summarize(ratio = 10^(mean(log10(fold_ace2_dep_infection))), .groups = "drop")
+
+Predict_BtKY72_plot <- ggplot() + 
+  theme(axis.text.x.bottom = element_text(angle = -45, hjust = 0, vjust = 0.5), panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), legend.position = "none") +
+  labs(x = NULL, y = "Fold ACE2\n-dependent infection") + scale_y_log10() + 
+  geom_hline(yintercept = 1, alpha = 0.2, size = 1.5) +
+  geom_point(data = prd_btky, aes(x = parent_rbd, y = fold_ace2_dep_infection), position = position_dodge(width = 0.8), alpha = 0.2) +
+  geom_point(data = prd_btky_summary, aes(x = parent_rbd, y = ratio), position = position_dodge(width = 0.8), shape = 95, size = 8) +
+  facet_grid(cols = vars(cell_label))
+Predict_BtKY72_plot
+```
+
+![](ACE2_dependence_files/figure-gfm/PREDICT-1.png)<!-- -->
+
+``` r
+ggsave(file = "Plots/Predict_BtKY72_plot.pdf", Predict_BtKY72_plot, height = 1.4, width = 2.8)
+```
+
 ``` r
 ace2_muts <- two_color_combined %>% filter(expt == "Btky72_ACE2muts" & !(recombined_construct == "Q42R"))# | pseudovirus_env == "G778B" 
 
@@ -1462,7 +1611,8 @@ original_mutant_data2 <- merge(original_mutant_data, pseudovirus_label_key, by =
 original_mutant_data_summary <<- original_mutant_data2 %>% group_by(cell_label, virus_label) %>% summarize(geomean = 10^mean(log_scaled_infection))
 ```
 
-    ## `summarise()` has grouped output by 'cell_label'. You can override using the `.groups` argument.
+    ## `summarise()` has grouped output by 'cell_label'. You can override using the
+    ## `.groups` argument.
 
 ``` r
 original_mutant_data_summary$recombined_construct <- ""
@@ -1474,6 +1624,7 @@ for(x in 1:nrow(original_mutant_data_summary)){
   original_mutant_data_summary$recombined_construct[x] <- substr(original_mutant_data_summary$cell_label[x],11,20)
   original_mutant_data_summary$geomean.decto_scaled[x] <- original_mutant_data_summary$geomean[x] / cntrl_frame[cntrl_frame$virus_label == temp_virus,"geomean"]
 }
+original_mutant_data_summary[original_mutant_data_summary$recombined_construct == "","recombined_construct"] <- "WT"
 
 singleplex_duplex_ace2_data <- merge(original_mutant_data_summary, two_color_ace2_muts_summary, by = c("recombined_construct","virus_label"))
 singleplex_duplex_ace2_data$geomean.decto_scaled <- as.numeric(singleplex_duplex_ace2_data$geomean.decto_scaled)
@@ -1483,9 +1634,9 @@ singleplex_duplex_ace2_ace2_muts_plot <- ggplot() + theme(panel.grid.minor = ele
   scale_color_manual(values = virus_colors2) +
   scale_x_log10() + scale_y_log10() + 
   geom_point(data = singleplex_duplex_ace2_data, aes(x = geomean.decto_scaled, y = geomean.y, color = virus_label), alpha = 0.5) +
-  geom_text_repel(data = singleplex_duplex_ace2_data %>% filter(virus_label != "VSV"), aes(x = geomean.decto_scaled, y = geomean.y, label = recombined_construct), size = 2)
-ggsave(file = "Plots/singleplex_duplex_ace2_ace2_muts_plot.pdf", singleplex_duplex_ace2_ace2_muts_plot, height = 2.5, width = 4)
-ggsave(file = "Plots/singleplex_duplex_ace2_ace2_muts_plot.png", singleplex_duplex_ace2_ace2_muts_plot, height = 2.5, width = 4)
+  geom_text_repel(data = singleplex_duplex_ace2_data %>% filter(virus_label != "VSV"), aes(x = geomean.decto_scaled, y = geomean.y, label = recombined_construct), size = 2, segment.alpha = 0.4)
+ggsave(file = "Plots/singleplex_duplex_ace2_ace2_muts_plot.pdf", singleplex_duplex_ace2_ace2_muts_plot, height = 2.5, width = 4.3)
+ggsave(file = "Plots/singleplex_duplex_ace2_ace2_muts_plot.png", singleplex_duplex_ace2_ace2_muts_plot, height = 2.5, width = 4.3)
 
 singleplex_duplex_ace2_ace2_muts_plot
 ```
@@ -1496,7 +1647,7 @@ singleplex_duplex_ace2_ace2_muts_plot
 cor(singleplex_duplex_ace2_data$geomean.y, singleplex_duplex_ace2_data$geomean.decto_scaled, method = "pearson")
 ```
 
-    ## [1] 0.9472555
+    ## [1] 0.9506675
 
 ``` r
 flow_ace2_muts <- two_color_precombined %>% filter(expt %in% c("Clade3_hum_muts","ACE2_muts") & moi_gvn_red != 0)
@@ -1532,14 +1683,14 @@ Flow_ace2muts_faceted
 ggsave(file = "Plots/Flow_ace2muts_faceted.pdf", Flow_ace2muts_faceted, height = 2.75, width = 3.8)
 ggsave(file = "Plots/Flow_ace2muts_faceted.png", Flow_ace2muts_faceted, height = 2.75, width = 3.8)
 
-Flow_ace2muts_heatmap <- ggplot() + theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5)) + 
+Flow_ace2muts_heatmap <- ggplot() + theme(axis.text.x = element_text(angle = -45, hjust = 0, vjust = 0.5)) + 
   labs(x = NULL, y = NULL, fill = "Fold") +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0.1,  na.value = "grey50", trans = "log10") + 
   geom_tile(data = flow_ace2_muts_summary, aes(x = cell_label, y = virus_label, fill = ratio)) +
   geom_text(data = flow_ace2_muts_summary, aes(x = cell_label, y = virus_label, label = round(ratio,1)), size = 2) +
   NULL
-ggsave(file = "Plots/Flow_ace2muts_heatmap.pdf", Flow_ace2muts_heatmap, height = 2, width = 3.5)
-ggsave(file = "Plots/Flow_ace2muts_heatmap.png", Flow_ace2muts_heatmap, height = 2, width = 3.5)
+ggsave(file = "Plots/Flow_ace2muts_heatmap.pdf", Flow_ace2muts_heatmap, height = 1.6, width = 3.5)
+ggsave(file = "Plots/Flow_ace2muts_heatmap.png", Flow_ace2muts_heatmap, height = 1.6, width = 3.5)
 Flow_ace2muts_heatmap
 ```
 
@@ -1644,12 +1795,8 @@ base_world_map_ggplot <- ggplot() + theme_bw() +
   coord_sf(xlim = c(-12, 145), ylim = c(-19, 60), expand = T) +
   NULL
 ggsave(file = "Plots/Base_world_map_ggplot.pdf", base_world_map_ggplot, height = 1.5, width = 4)
-base_world_map_ggplot
-```
+#base_world_map_ggplot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-1.png)<!-- -->
-
-``` r
 ferrum_shape <- here("Data/Maps/ferrumequinum_redlist_species_data_8e16dc36-7b4b-44b9-9840-799c4a0f6a53/data_0.shp") %>% st_read()
 ```
 
@@ -1671,12 +1818,8 @@ ferrum_map_plot <- base_world_map_ggplot + geom_sf(data = ferrum_shape, fill="re
 
 ``` r
 ggsave(file = "Plots/Ferrum_map_plot.pdf", ferrum_map_plot, height = 2, width = 4)
-ferrum_map_plot
-```
+#ferrum_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-2.png)<!-- -->
-
-``` r
 affinis_shape <- here("Data/Maps/affinis_redlist_species_data_e5cea578-fa93-46b4-bcd1-72db305e97de/data_0.shp") %>% st_read()
 ```
 
@@ -1698,12 +1841,8 @@ affinis_map_plot <- base_world_map_ggplot + geom_sf(data = affinis_shape, fill="
 
 ``` r
 ggsave(file = "Plots/Affinis_map_plot.pdf", affinis_map_plot, height = 2, width = 4)
-affinis_map_plot
-```
+#affinis_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-3.png)<!-- -->
-
-``` r
 hippo_shape <- here("Data/Maps/hipposideros_redlist_species_data_81732104-6de7-456f-9dec-2f1fcd484c6f/data_0.shp") %>% st_read()
 ```
 
@@ -1725,12 +1864,8 @@ hippo_map_plot <- base_world_map_ggplot + geom_sf(data = hippo_shape, fill="red"
 
 ``` r
 ggsave(file = "Plots/Hippo_map_plot.pdf", hippo_map_plot, height = 2, width = 4)
-hippo_map_plot
-```
+#hippo_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-4.png)<!-- -->
-
-``` r
 alcyone_shape <- here("Data/Maps/alcyone_redlist_species_data_ee5660d2-1774-4c77-8970-9a473e1c66a5/data_0.shp") %>% st_read()
 ```
 
@@ -1752,12 +1887,8 @@ alcyone_map_plot <- base_world_map_ggplot + geom_sf(data = alcyone_shape, fill="
 
 ``` r
 ggsave(file = "Plots/Alcyone_map_plot.pdf", alcyone_map_plot, height = 2, width = 4)
-alcyone_map_plot
-```
+#alcyone_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-5.png)<!-- -->
-
-``` r
 landeri_shape <- here("Data/Maps/landeri_redlist_species_data_87e5a8c2-0fd6-4f3d-8f4b-fcf34c2e89f3/data_0.shp") %>% st_read()
 ```
 
@@ -1779,12 +1910,8 @@ landeri_map_plot <- base_world_map_ggplot + geom_sf(data = landeri_shape, fill="
 
 ``` r
 ggsave(file = "Plots/Landeri_map_plot.pdf", landeri_map_plot, height = 2, width = 4)
-landeri_map_plot
-```
+#landeri_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-6.png)<!-- -->
-
-``` r
 pearsonii_shape <- here("Data/Maps/pearsonii_redlist_species_data_a96e1d46-d9a0-40f7-b3a5-1ad1b91e2431/data_0.shp") %>% st_read()
 ```
 
@@ -1806,12 +1933,8 @@ pearsonii_map_plot <- base_world_map_ggplot + geom_sf(data = pearsonii_shape, fi
 
 ``` r
 ggsave(file = "Plots/Pearsonii_map_plot.pdf", affinis_map_plot, height = 2, width = 4)
-pearsonii_map_plot
-```
+#pearsonii_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-7.png)<!-- -->
-
-``` r
 sinicus_shape <- here("Data/Maps/sinicus_redlist_species_data_c0256091-31d3-4426-b8d6-791db2f0e7d6/data_0.shp") %>% st_read()
 ```
 
@@ -1833,12 +1956,8 @@ sinicus_map_plot <- base_world_map_ggplot + geom_sf(data = sinicus_shape, fill="
 
 ``` r
 ggsave(file = "Plots/Sinicus_map_plot.pdf", sinicus_map_plot, height = 2, width = 4)
-sinicus_map_plot
-```
+#sinicus_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-8.png)<!-- -->
-
-``` r
 blasii_shape <- here("Data/Maps/blasii_redlist_species_data_cea535e3-2ee3-4223-aad2-d2a071e66a6d/data_0.shp") %>% st_read()
 ```
 
@@ -1860,12 +1979,8 @@ blasii_map_plot <- base_world_map_ggplot + geom_sf(data = blasii_shape, fill="re
 
 ``` r
 ggsave(file = "Plots/Blasii_map_plot.pdf", blasii_map_plot, height = 2, width = 4)
-blasii_map_plot
-```
+#blasii_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-9.png)<!-- -->
-
-``` r
 euryale_shape <- here("Data/Maps/euryale_redlist_species_data_4dbfc03e-ae50-4d4c-ac73-53a0757f19ec/data_0.shp") %>% st_read()
 ```
 
@@ -1887,12 +2002,8 @@ euryale_map_plot <- base_world_map_ggplot + geom_sf(data = euryale_shape, fill="
 
 ``` r
 ggsave(file = "Plots/Euryale_map_plot.pdf", euryale_map_plot, height = 2, width = 4)
-euryale_map_plot
-```
+#euryale_map_plot
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-10.png)<!-- -->
-
-``` r
 Clade3_map_plot <- base_world_map_ggplot + 
   geom_sf(data = euryale_shape, fill="yellow", alpha = 0.4, size = 0.1) + 
   geom_sf(data = blasii_shape, fill="cyan", alpha = 0.4, size = 0.1) + 
@@ -1921,7 +2032,7 @@ ggsave(file = "Plots/Clade3_map_plot.png", Clade3_map_plot, height = 1.5, width 
 Clade3_map_plot
 ```
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-11.png)<!-- -->
+![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-1.png)<!-- -->
 
 ``` r
 ACE2_clade3_map_plot <- base_world_map_ggplot + 
@@ -1953,7 +2064,7 @@ ggsave(file = "Plots/ACE2_clade3_map_plot.png", ACE2_clade3_map_plot, height = 1
 ACE2_clade3_map_plot
 ```
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-12.png)<!-- -->
+![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-2.png)<!-- -->
 
 ``` r
 Clade3_combined_map_plot <- base_world_map_ggplot + 
@@ -1980,7 +2091,7 @@ ggsave(file = "Plots/Clade3_combined_map_plot.png", Clade3_combined_map_plot, he
 Clade3_combined_map_plot
 ```
 
-![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-13.png)<!-- -->
+![](ACE2_dependence_files/figure-gfm/Incorporating%20the%20bat%20species%20range%20data-3.png)<!-- -->
 
 ``` r
 ## Flow data first
@@ -2109,6 +2220,60 @@ ggsave(file = "Plots/Bar_chart_microscopy_khosta1.pdf", Bar_chart_microscopy_kho
 ```
 
 ``` r
+q493_muts <- two_color_precombined %>% filter(expt %in% c("Q493_muts"))
+
+q493_muts$red_cells <- q493_muts$live_singlets * q493_muts$pct_red / 100
+q493_muts$red_then_grn_cells <- round(q493_muts$red_cells * q493_muts$pct_grn_gvn_red / 100,0)
+q493_muts$nir_cells <- q493_muts$live_singlets * q493_muts$pct_nir / 100
+q493_muts$nir_then_grn_cells <- round(q493_muts$nir_cells * q493_muts$pct_grn_gvn_nir / 100,0)
+
+q493_muts_1 <- q493_muts %>% filter(passes_lower_bound == "yes" & nir_then_grn_cells > 5) %>% group_by(recombined_construct, pseudovirus_env) %>% mutate(pct_grn_gvn_red = red_then_grn_cells / red_cells * 100, pct_grn_gvn_nir = nir_then_grn_cells / nir_cells * 100) %>% mutate(moi_gvn_red = -log(1-pct_grn_gvn_red/100), moi_gvn_nir = -log(1-pct_grn_gvn_nir/100))
+
+q493_muts_1$log10_nir_red_diff <- log10(q493_muts_1$moi_gvn_nir) - log10(q493_muts_1$moi_gvn_red)
+q493_muts_1$fold_ace2_dep_infection <- 10^q493_muts_1$log10_nir_red_diff
+q493_muts_1 <- q493_muts_1 %>% filter(log10_nir_red_diff != "Inf" & log10_nir_red_diff != "-Inf")
+
+q493_muts_2 <- merge(q493_muts_1, pseudovirus_label_key, by = "pseudovirus_env")
+q493_muts_2 <- merge(q493_muts_2, recombined_construct_key, by = "recombined_construct")
+q493_muts_2 <- q493_muts_2 %>% filter(parent_rbd != "PRD0038")
+
+q493_muts_2$log10_nir_red_diff <- log10(q493_muts_2$moi_gvn_nir) - log10(q493_muts_2$moi_gvn_red)
+q493_muts_2$fold_ace2_dep_infection <- 10^q493_muts_2$log10_nir_red_diff
+
+flow_ace2_muts_summary <- q493_muts_2 %>% filter(!(fold_ace2_dep_infection %in% c(NaN,0,Inf))) %>% group_by(cell_label, parent_rbd, interface_res) %>% summarize(ratio = 10^(mean(log10(fold_ace2_dep_infection))), .groups = "drop")
+
+#Interface_mutants_plot <- ggplot() + 
+#  theme(axis.text.x.bottom = element_text(angle = -45, hjust = 0), panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), legend.position = "none") +
+#  labs(x = NULL, y = "Fold ACE2\n-dependent infection") + scale_y_log10() + 
+#  geom_hline(yintercept = 1, alpha = 0.2, size = 1.5) +
+#  geom_point(data = q493_muts_2, aes(x = parent_rbd, y = fold_ace2_dep_infection, color = interface_res), position = position_dodge(width = 0.8), alpha = 0.2) +
+#  geom_text(data = flow_ace2_muts_summary, aes(x = parent_rbd, y = ratio, label = interface_res, color = interface_res), position = position_dodge(width = 0.8)) +
+#  facet_grid(rows = vars(cell_label))
+#Interface_mutants_plot
+
+## Hone in on the most informative subset
+
+q493_muts_2_plotting <- q493_muts_2 %>% filter(parent_rbd %in% c("VSVG","SARS-CoV" ,"SARS-CoV-2","BtKY72","Khosta2","Khosta1") & virus_label != "BtKY72 0-955")
+flow_ace2_muts_summary_plotting <- flow_ace2_muts_summary %>% filter(parent_rbd %in% c("VSVG","SARS-CoV" , "SARS-CoV-2","Khosta2","BtKY72","Khosta1"))
+q493_muts_2_plotting$parent_rbd <- factor(q493_muts_2_plotting$parent_rbd, levels = rev(c("VSVG","SARS-CoV" , "SARS-CoV-2","Khosta2","BtKY72","Khosta1")))
+
+Interface_mutants_plot1 <- ggplot() + 
+  theme(axis.text.x.bottom = element_text(angle = -45, hjust = 0), panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), legend.position = "none") +
+  labs(x = NULL, y = "Fold ACE2\n-dependent infection") + scale_y_log10() + 
+  geom_hline(yintercept = 1, alpha = 0.2, size = 1.5) +
+  geom_point(data = q493_muts_2_plotting, aes(x = parent_rbd, y = fold_ace2_dep_infection, color = interface_res), position = position_dodge(width = 0.8), alpha = 0.2) +
+  geom_text(data = flow_ace2_muts_summary_plotting, aes(x = parent_rbd, y = ratio, label = interface_res, color = interface_res), position = position_dodge(width = 0.8)) +
+  facet_grid(rows = vars(cell_label))
+Interface_mutants_plot1
+```
+
+![](ACE2_dependence_files/figure-gfm/Looking%20at%20the%20Q493%20variants-1.png)<!-- -->
+
+``` r
+ggsave(file = "Plots/Interface_mutants_plot1.pdf", Interface_mutants_plot1, height = 2.2, width = 3)
+```
+
+``` r
 # https://rpubs.com/sinhrks/plot_mds
 
 rbd_dist_matrix3 <- rbd_dist_matrix
@@ -2137,23 +2302,33 @@ ggsave(file = "Plots/ACE2_receptor_usage_by_sequence_matrix.pdf", ACE2_receptor_
 ```
 
 ``` r
-supptable <- read.csv(file = "Data/ACE2_dependence_tables - Table1_sequences_used.csv") %>% filter(cys != 1 & clade != 5)
+## Seeing why figure 2D has much lower ACE2-dependent infection than some of the other experiments
 
-#supptable2 <- merge(supptable[,c("name","cys")], clade_labels_key, by = "name")
+receptors_ace2 <- two_color_combined %>% filter(expt == "Receptors" & recombined_construct == "ACE2" & pseudovirus_env == "SARS1")
 
-clade_cys_table <- data.frame(table(supptable[,c("cys","clade")]))
+bat_ace2 <- two_color_combined %>% filter(expt == "Bat_ACE2s" & recombined_construct == "G852C" & pseudovirus_env == "SARS1")
+for(x in 1:nrow(bat_ace2)){if(bat_ace2$pct_nir[x] > 100){bat_ace2$pct_nir[x] <- bat_ace2$pct_nir[x]/bat_ace2$live_singlets[x] * 100}}
 
-clade_cys_table$cys = factor(clade_cys_table$cys, levels = c(2,0))
+q493_muts <- two_color_combined %>% filter(expt == "Q493_muts" & recombined_construct == "G852C" & pseudovirus_env == "R12")
 
-Cysteine_plot <- ggplot() + labs(x = "Clade", y = "Cysteines") +
-  scale_fill_gradient(low = "white", high = "red") + 
-  geom_tile(data = clade_cys_table, aes(x = clade, y = cys, fill = Freq)) +
-  geom_text(data = clade_cys_table, aes(x = clade, y = cys, label = Freq))
-Cysteine_plot
+cell_mixing_labels <- c("expt","moi_gvn_red","moi_gvn_nir","ratio_nir_mcherry")
+
+cell_mixing <- rbind(receptors_ace2[,cell_mixing_labels], bat_ace2[,cell_mixing_labels], q493_muts[,cell_mixing_labels])
+
+cell_mixing$fold_ace2_dep_infxn <- cell_mixing$moi_gvn_nir/cell_mixing$moi_gvn_red
+
+for(x in 1:nrow(cell_mixing)){
+  if(cell_mixing$expt[x] == "Receptors"){cell_mixing$expt[x] <- "Fig 2D"}
+  if(cell_mixing$expt[x] == "Bat_ACE2s"){cell_mixing$expt[x] <- "Fig 5A"}
+  if(cell_mixing$expt[x] == "Q493_muts"){cell_mixing$expt[x] <- "Fig 7D"}
+}
+
+Ratio_dependent_ACE2_infection_plot <- ggplot() + theme(panel.grid.minor = element_blank(), legend.position = "top") + 
+  labs(x = "Ratio of NIR to mCherry cells in well", y = "Fold ACE2-dependent infection") +
+  scale_x_log10() + scale_y_log10(limits = c(1,400)) + 
+  geom_point(data = cell_mixing, aes(x = ratio_nir_mcherry, y = fold_ace2_dep_infxn, color = expt), alpha = 0.5)
+ggsave(file = "plots/Ratio_dependent_ACE2_infection_plot.pdf", Ratio_dependent_ACE2_infection_plot, height = 2.5, width = 3)
+Ratio_dependent_ACE2_infection_plot
 ```
 
-![](ACE2_dependence_files/figure-gfm/Disulfides-1.png)<!-- -->
-
-``` r
-ggsave(file = "Plots/Cysteine_plot.pdf", Cysteine_plot, height = 0.9, width = 2)
-```
+![](ACE2_dependence_files/figure-gfm/Answering%20reviewer%20comment%20about%20variable%20effect%20magnitudes%20across%20figures-1.png)<!-- -->
