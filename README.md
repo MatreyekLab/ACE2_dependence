@@ -1,7 +1,8 @@
 ACE2_dependence
 ================
 Kenneth Matreyek
-1/12/2021
+first started 1/12/2021
+finished 6/9/2022
 
 ``` r
 ## Clear existing environment
