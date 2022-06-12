@@ -66,7 +66,7 @@ virus_colors <- c("VSV" = "red", "SARS-CoV" = "darkgreen", "SARS-CoV-2" = "blue"
 ```
 
 ``` r
-combined_infection <- read.csv(file = "Supp_tables/Supplementary_Table_2.csv")
+combined_infection <- read.csv(file = "Supp_tables/S2_Table.csv")
 
 recombined_construct_key <- read.csv(file = "Data/Keys/Construct_label_key.csv", header = T, stringsAsFactors = F)
 pseudovirus_label_key <- read.csv(file = "Data/Keys/Pseudovirus_label_key.csv", header = T, stringsAsFactors = F) #%>% filter(sequence_confirmed != "no")
@@ -525,7 +525,7 @@ Clade_difference_plot
 ![](ACE2_dependence_files/figure-gfm/Clade-wise%20differences%20in%20RBD%20sequences-1.png)<!-- -->
 
 ``` r
-supptable <- read.csv(file = "Supp_tables/Supplementary_Table_1.csv") %>% filter(cys != 1 & clade != 5)
+supptable <- read.csv(file = "Supp_tables/S1_Table.csv") %>% filter(cys != 1 & clade != 5)
 
 #supptable2 <- merge(supptable[,c("name","cys")], clade_labels_key, by = "name")
 
@@ -1482,7 +1482,7 @@ chimerics_2 <- merge(chimerics_2, recombined_construct_key, by = "recombined_con
 chimerics_2$log10_nir_red_diff <- log10(chimerics_2$moi_gvn_nir) - log10(chimerics_2$moi_gvn_red)
 chimerics_2$fold_ace2_dep_infection <- 10^chimerics_2$log10_nir_red_diff
 
-chimerics_3 <- chimerics_2 %>% filter(!(fold_ace2_dep_infection %in% c(NaN,0,Inf))) %>% filter(((parent_rbd == "BtKY72" & interface_res == "K") | (parent_rbd == "Khosta2" & interface_res == "Q")) & cell_label %in% c("H.sapiens","R.alcyone")) %>% mutate(type = "chimeric")
+chimerics_3 <- chimerics_2 %>% filter(!(fold_ace2_dep_infection %in% c(NaN,0,Inf))) %>% filter(((parent_rbd == "BtKY72" & interface_res == "K")) & cell_label %in% c("H.sapiens","R.alcyone")) %>% mutate(type = "chimeric")
 
 vsvg <- full_length_2 %>% filter(pseudovirus_env == "VSVG")
 vsvg$type <- "full_length"
@@ -1493,16 +1493,19 @@ chimerics_and_full_length <- rbind(chimerics_3[,columns_for_chimerics_full_lengt
                                    full_length_2[,columns_for_chimerics_full_length],
                                    vsvg[,columns_for_chimerics_full_length]) %>% filter(parent_rbd != "SARS-CoV")
 
+chimerics_and_full_length$label <- paste(chimerics_and_full_length$parent_rbd,chimerics_and_full_length$type,sep="_")
+
 chimerics_and_full_length_summary <- chimerics_and_full_length %>% group_by(cell_label, parent_rbd, type) %>% summarize(ratio = 10^(mean(log10(fold_ace2_dep_infection))), .groups = "drop")
+
+chimerics_and_full_length_summary$label <- paste(chimerics_and_full_length_summary$parent_rbd,chimerics_and_full_length_summary$type,sep="_")
+
 
 Full_length_plot2 <- ggplot() + theme(axis.text.x.bottom = element_text(angle = -90, hjust = 0, vjust = 0.5), panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), legend.position = "right") + 
   labs(x = NULL, y = "Fold ACE2\n-dependent infection") + 
   scale_y_log10() + 
   geom_hline(yintercept = 1, size = 3, alpha = 0.2) +
-  geom_point(data = chimerics_and_full_length, aes(x = parent_rbd, y = fold_ace2_dep_infection, color = type),
-             position = position_dodge(width = 0.5), alpha = 0.2) +
-  geom_point(data = chimerics_and_full_length_summary, aes(y = ratio, x = parent_rbd, color = type), 
-             position = position_dodge(width = 0.5), shape = 95, size = 8) +
+  geom_quasirandom(data = chimerics_and_full_length, aes(x = label, y = fold_ace2_dep_infection, color = type), alpha = 0.2) +
+  geom_point(data = chimerics_and_full_length_summary, aes(y = ratio, x = label, color = type), shape = 95, size = 8) +
   facet_grid(cols = vars(cell_label)) +
   NULL
 Full_length_plot2
@@ -1511,7 +1514,7 @@ Full_length_plot2
 ![](ACE2_dependence_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ``` r
-ggsave(file = "Plots/Full_length_plot2.pdf", Full_length_plot2, height = 1.7, width = 3.5)
+ggsave(file = "Plots/Full_length_plot2.pdf", Full_length_plot2, height = 2.2, width = 3.5)
 ```
 
 ``` r
