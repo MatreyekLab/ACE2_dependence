@@ -1,0 +1,7 @@
+cell_label,parent_rbd,type,ratio,label
+H.sapiens,BtKY72,chimeric,6.11319723103979,BtKY72_chimeric
+H.sapiens,BtKY72,full_length,6.4310266932387,BtKY72_full_length
+H.sapiens,VSVG,full_length,1.25114686886852,VSVG_full_length
+R.alcyone,BtKY72,chimeric,33.5754848376568,BtKY72_chimeric
+R.alcyone,BtKY72,full_length,6.73763420320933,BtKY72_full_length
+R.alcyone,VSVG,full_length,0.652752989625659,VSVG_full_length

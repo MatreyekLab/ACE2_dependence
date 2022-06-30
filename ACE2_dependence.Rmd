@@ -33,7 +33,7 @@ virus_colors <- c("VSV" = "red", "SARS-CoV" = "darkgreen", "SARS-CoV-2" = "blue"
 
 ```{r Import the flow data as well as relevant samples keys}
 
-combined_infection <- read.csv(file = "Supp_tables/S2_Table.csv")
+combined_infection <- read.csv(file = "Supp_tables/S1_Data.csv")
 
 recombined_construct_key <- read.csv(file = "Data/Keys/Construct_label_key.csv", header = T, stringsAsFactors = F)
 pseudovirus_label_key <- read.csv(file = "Data/Keys/Pseudovirus_label_key.csv", header = T, stringsAsFactors = F) #%>% filter(sequence_confirmed != "no")
@@ -144,11 +144,16 @@ Mixed_cell_fold_ACE2_dependence <- ggplot() + theme_bw() + theme(panel.grid.mino
 Mixed_cell_fold_ACE2_dependence
 ggsave(file = "Plots/Mixed_cell_fold_ACE2_dependence.pdf", Mixed_cell_fold_ACE2_dependence, height = 1.75, width = 4)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_1E_mixed.csv",
+          mixed_cell_infection_summary2[,c("virus_label","pct_nir","n","mean","upper_conf","lower_conf")], quote = FALSE, row.names = FALSE)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_1E_unmixed.csv",
+          unmixed_cell_dataframe_summary2[,c("virus_label","n","mean","upper_conf","lower_conf")], quote = FALSE, row.names = FALSE)
 
 ## Figure out the coefficient of variation
 unmixed_cell_dataframe_summary2$cv <- 10^(unmixed_cell_dataframe_summary2$log10_sd)/10^(unmixed_cell_dataframe_summary2$log10_mean)
 mixed_cell_infection_summary2$cv <- 10^(mixed_cell_infection_summary2$log10_sd)/10^(mixed_cell_infection_summary2$log10_mean)
-
+x
 Mixed_cell_cv <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(), legend.position = "none") + 
   labs(x = "% ACE2 cells in well", y = "CV") +
   scale_x_continuous(limits = c(-10,100), expand = c(0,0), breaks = c(10,20,40,60,80,90)) + #scale_x_log10(breaks = c(0.3,1,3,10,30), limits = c(0.08,10)) + 
@@ -229,6 +234,9 @@ ggsave(file = "Plots/Receptors_scatterplot.png", Receptors_scatterplot, height =
 
 paste("The Pearson's r^2 of the untagged and tagged protein infection data is:",round(cor(tagged_vs_untagged_receptors_dataframe$tagged, tagged_vs_untagged_receptors_dataframe$untagged, method = "pearson")^2,2))
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_2C.csv", tagged_vs_untagged_receptors_dataframe, quote = FALSE, row.names = FALSE)
+
+
 ### Make the statistical test to see which proteins reproducibly increase infectivity
 full_variant_t_test <- data.frame("cell_label" = rep(unique(receptors_grouped_summary$receptor_grouped),each = length(unique(receptors_grouped_summary$virus_label))),
                                           "virus_label" =  rep(unique(receptors_grouped_summary$virus_label),length(unique(receptors_grouped_summary$receptor_grouped))),
@@ -263,7 +271,7 @@ receptors_panel
 ggsave(file = "Plots/Receptors_panel.pdf", receptors_panel, height = 1.5, width = 4.8)
 ggsave(file = "Plots/Receptors_panel.png", receptors_panel, height = 1.5, width = 4.8)
 
-
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_2D.csv", receptors_grouped_summary, quote = FALSE, row.names = FALSE)
 
 paste("ACE2 increased SARS-CoV pseudovirus infection roughly:",round(subset(receptors_grouped_summary, receptor_grouped == "ACE2" & virus_label == "SARS-CoV")$geomean,1))
 paste("ACE2 increased SARS-CoV pseudovirus infection roughly:",round(subset(receptors_grouped_summary, receptor_grouped == "ACE2" & virus_label == "SARS-CoV-2")$geomean,1))
@@ -352,6 +360,8 @@ Two_color_ACE2_dep_panel
 ggsave(file = "Plots/Two_color_ACE2_dep_panel.pdf", Two_color_ACE2_dep_panel, height = 1.3, width = 3)
 ggsave(file = "Plots/Two_color_ACE2_dep_panel.png", Two_color_ACE2_dep_panel, height = 1.3, width = 3)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_3A.csv", diverse_virus_subset_summary, quote = FALSE, row.names = FALSE)
+
 ```
 
 ```{r Initial RBD identity matrix}
@@ -383,6 +393,8 @@ rbd_identity_matrix_plot <- ggplot() + theme_bw() +
   NULL
 ggsave(file = "Plots/RBD_identity_matrix_plot.pdf", rbd_identity_matrix_plot, height = 5.1, width = 6)
 rbd_identity_matrix_plot
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_3B.csv", rbd_dist_melted, quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -437,6 +449,8 @@ Clade_difference_plot <- ggplot() + theme(panel.grid.minor.x = element_blank(), 
 ggsave(file = "Plots/Clade_difference_plot.pdf", Clade_difference_plot, height = 1.2, width = 2.5)
 Clade_difference_plot
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_3C.csv", rbd_dist_melted3, quote = FALSE, row.names = FALSE)
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_2.csv", rbd_dist_melted3, quote = FALSE, row.names = FALSE)
 ```
 
 ```{r Disulfides}
@@ -454,6 +468,8 @@ Cysteine_plot <- ggplot() + labs(x = "Clade", y = "Cysteines") +
   geom_text(data = clade_cys_table, aes(x = clade, y = cys, label = Freq))
 Cysteine_plot
 ggsave(file = "Plots/Cysteine_plot.pdf", Cysteine_plot, height = 0.9, width = 2)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_3E.csv", clade_cys_table, quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -516,6 +532,8 @@ rbd_subset2$cells <- "ACE2"
 rbd_subset2$dep_infection <- rbd_subset2$ace2dep_infection
 
 rbd_subset_summary$cells <- "ACE2"
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_3H.csv", rbd_subset_summary, quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -588,6 +606,7 @@ ACE2_ACE2TMPRSS2_bothplot
 ggsave(file = "Plots/ACE2_ACE2TMPRSS2_bothplot.pdf", ACE2_ACE2TMPRSS2_bothplot, height = 2, width = 4)
 ggsave(file = "Plots/ACE2_ACE2TMPRSS2_bothplot.png", ACE2_ACE2TMPRSS2_bothplot, height = 2, width = 4)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_3C.csv", rbds_both_dataset_summary, quote = FALSE, row.names = FALSE)
 
 two_color_ace2_dep_summary_rbds <- two_color_ace2_dep_summary %>% filter(virus_label %in% c("Junin virus", "SARS-CoV","WIV1 RBD", "SARS-CoV-2 RBD", "Rp3 RBD", "YN2013 RBD", "BM48-31 RBD", "BB9904 RBD", "Rs4237 RBD", "BtKY72 RBD"))
 two_color_ace2_tmprss2_dep_summary_rbds <- two_color_ace2_tmprss2_dep_summary %>% filter(virus_label %in% c("Junin virus", "SARS-CoV","WIV1 RBD", "SARS-CoV-2 RBD", "Rp3 RBD", "YN2013 RBD","BM48-31 RBD", "BB9904 RBD", "Rs4237 RBD", "BtKY72 RBD"))
@@ -668,6 +687,8 @@ ACE2_TMPRSS2_btky72_plot
 ggsave(file = "Plots/ACE2_TMPRSS2_btky72_plot.pdf", ACE2_TMPRSS2_btky72_plot, height = 2, width = 3.5)
 ggsave(file = "Plots/ACE2_TMPRSS2_btky72_plot.png", ACE2_TMPRSS2_btky72_plot, height = 2, width = 3.5)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_9.csv", two_color_ace2_tmprss2_dep_summary_btky72, quote = FALSE, row.names = FALSE)
+
 two_color_ace2_dep_summary_btky72_segments <- two_color_ace2_dep_summary %>% filter(virus_label %in% c("Junin virus", "BtKY72 RBD", "BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955","BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955", "BtKY72 1-120;329-539", "BtKY72 112-206;329-539", "BtKY72 214-328;329-539"))
 two_color_ace2_tmprss2_dep_summary_btky72_segments <- two_color_ace2_tmprss2_dep_summary %>% filter(virus_label %in% c("Junin virus", "BtKY72 RBD", "BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955","BtKY72 1-539", "BtKY72 1-888", "BtKY72 1-955", "BtKY72 1-120;329-539", "BtKY72 112-206;329-539", "BtKY72 214-328;329-539"))
 ace2_with_tmprss2_btky72_segments <- merge(two_color_ace2_dep_summary_btky72_segments[,c("virus_label","geomean")], two_color_ace2_tmprss2_dep_summary_btky72_segments[,c("virus_label","geomean")], by = "virus_label")
@@ -697,6 +718,9 @@ ACE2_TMPRSS2_btky72_mut_plot
 ggsave(file = "Plots/ACE2_TMPRSS2_btky72_mut_plot.pdf", ACE2_TMPRSS2_btky72_mut_plot, height = 1.85, width = 1.3)
 ggsave(file = "Plots/ACE2_TMPRSS2_btky72_mut_plot.png", ACE2_TMPRSS2_btky72_mut_plot, height = 1.85, width = 1.3)
 
+temp_data_for_export <- two_color_ace2_tmprss2_dep_summary_btky72 %>% filter(virus_label %in% c("BtKY72 RBD", "BtKY72 RBD [Y488H]", "BtKY72 RBD [T499E]"))
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_3H_right.csv", temp_data_for_export, quote = FALSE, row.names = FALSE)
 ```
 
 ```{r Making the identity matrix of the ACE2 orthologs we were able to make}
@@ -764,6 +788,8 @@ Ace2_differences_linear_seq_plot <- ggplot() + theme_bw() + theme(panel.grid.min
 ggsave(file = "Plots/Ace2_differences_linear_seq_plot.pdf", Ace2_differences_linear_seq_plot, height = 1, width = 1.75)
 Ace2_differences_linear_seq_plot
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_4A.csv", df_amino_acid_matrix, quote = FALSE, row.names = FALSE)
+
 subset(df_amino_acid_matrix, amino_acids >= 4)
 subset(df_amino_acid_matrix, amino_acids >= 3 & position < 400)
 
@@ -809,6 +835,8 @@ ACE2_tested_identity_matrix_plot <- ggplot() + theme_bw() +
 ggsave(file = "Plots/ACE2_tested_identity_matrix_plot.pdf", ACE2_tested_identity_matrix_plot, height = 2.3*2, width = 2.8*2)
 ACE2_tested_identity_matrix_plot
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_4C.csv", ace2_tested_dist_melted, quote = FALSE, row.names = FALSE)
+
 ```
 
 
@@ -841,6 +869,8 @@ all_ace2_identity_matrix_plot <- ggplot() + theme_bw() +
   NULL
 ggsave(file = "Plots/all_ace2_identity_matrix_plot.pdf", all_ace2_identity_matrix_plot, height = 6, width = 7)
 all_ace2_identity_matrix_plot
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_4.csv", all_ace2_dist_melted, quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -949,6 +979,10 @@ ggsave(file = "Export_250_plot.pdf", Export_250_plot, height = 2.2, width = 2.5)
 amnis_cell_numbers <- c(1528,1310,1050,565,980,1121,1052,987,1178,1555)
 sum(amnis_cell_numbers)
 
+fig4e_for_export <- rbind(bf_summary2 %>% mutate(type = "brightfield"), mirfp670_summary %>% mutate(type = "mirfp670"), af488_summary %>% mutate(type = "af488"))
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_4E.csv", fig4e_for_export, quote = FALSE, row.names = FALSE)
+
 ```
 
 
@@ -1005,6 +1039,9 @@ ggplot() + theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5)
 Faceted_bar_chart_flow
 ggsave(file = "Plots/Faceted_bar_chart_flow.pdf", Faceted_bar_chart_flow, height = 6, width = 4)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_8_left.csv", bat_ace2s_2_summary %>% mutate(type = "flow_cytometry"), quote = FALSE, row.names = FALSE)
+
+
 ##### R.sinicus200 and SARS[Khosta1 RBD] combo making NaN so throw it out until I get more data
 bat_ace2s_2_summary_for_plotting <- bat_ace2s_2_summary %>% filter(!(virus_label == "SARS[Khosta1 RBD]" & cell_label == "R.sinicus200"))
 bat_ace2s_2_summary_for_plotting[bat_ace2s_2_summary_for_plotting$geomean >= 100,"geomean"] <- 100
@@ -1025,6 +1062,8 @@ Bat_ACE2_heatmap <- ggplot() + theme(axis.text.x = element_text(angle = -90, hju
 Bat_ACE2_heatmap
 ggsave(file = "Plots/Bat_ACE2_heatmap.pdf", Bat_ACE2_heatmap, height = 3.5, width = 4.67)
 ggsave(file = "Plots/Bat_ACE2_heatmap.png", Bat_ACE2_heatmap, height = 3.5, width = 4.67)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_5A_top.csv", bat_ace2s_2_summary_for_plotting %>% mutate(type = "flow_cytometry"), quote = FALSE, row.names = FALSE)
 
 ## What values am I getting for Rp3 and YN2013 and Pearsonii
 clade2_pearsonii <- bat_ace2s_2 %>% filter(cell_label == "R.pearsonii" & virus_label %in% c("SARS[YN2013 RBD]","SARS[Rp3 RBD]","SARS[Rs4237 RBD]"))
@@ -1062,6 +1101,9 @@ ggplot() + theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5)
 Faceted_bar_chart_microscopy
 ggsave(file = "Plots/Faceted_bar_chart_microscopy.pdf", Faceted_bar_chart_microscopy, height = 6, width = 4)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_8_right.csv", microscopy_batace2_summary %>% mutate(type = "microscopy"), quote = FALSE, row.names = FALSE)
+
+
 Microscopy_heatmap <- ggplot() + theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5)) + 
   labs(x = NULL, y = NULL, fill = "Fold") +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0.1,  na.value = "grey50", trans = "log10", limits = c(0.5,10)) + 
@@ -1069,10 +1111,11 @@ Microscopy_heatmap <- ggplot() + theme(axis.text.x = element_text(angle = -90, h
   geom_text(data = microscopy_batace2_summary, aes(x = cell_label, y = virus_label, label = round(ratio,1)), size = 1.8) +
   geom_tile(data = host_virus_paired, aes(x = cell_label, y = virus_label), color = "black", fill = NA, size = 0.25) +
   NULL
-
+Microscopy_heatmap
 ggsave(file = "Plots/Microscopy_heatmap.pdf", Microscopy_heatmap, height = 3.5, width = 4.5)
 ggsave(file = "Plots/Microscopy_heatmap.png", Microscopy_heatmap, height = 3.5, width = 4.5)
-Microscopy_heatmap
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_5A_bottom.csv", microscopy_batace2_summary %>% mutate(type = "microscopy"), quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -1087,7 +1130,11 @@ grouped_by_virus_plot <- ggplot() + theme(panel.grid.minor = element_blank()) +
   labs(x = "Flow cytometry", y = "Microscopy") + 
   geom_text_repel(data = flow_micro_summary, aes(x = mean_flow, y = mean_micro, label = virus_label), color = "red", size = 2, segment.color = "orange", segment.alpha = 0.4) +
   geom_point(data = flow_micro_summary, aes(x = mean_flow, y = mean_micro), alpha = 0.5)
+grouped_by_virus_plot
 ggsave(file = "Plots/Grouped_by_virus_plot.pdf", grouped_by_virus_plot, height = 2, width = 2.75)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_5C_top.csv", flow_micro_summary, quote = FALSE, row.names = FALSE)
+
 
 flow_summary2 <- bat_ace2s_2_summary_for_plotting %>% filter(cell_label != "NULL (fs)" & virus_label != "VSV") %>% group_by(cell_label) %>% summarize(mean_flow = mean(geomean))
 microscope_summary2 <- microscopy_batace2_summary %>% filter(cell_label != "NULL (fs)" & virus_label != "VSV") %>% group_by(cell_label) %>% summarize(mean_micro = mean(ratio))
@@ -1099,7 +1146,10 @@ grouped_by_cell_plot <- ggplot() + theme(panel.grid.minor = element_blank()) +
   labs(x = "Flow cytometry", y = "Microscopy") + 
   geom_text_repel(data = flow_micro_summary2, aes(x = mean_flow, y = mean_micro, label = cell_label), color = "red", size = 2, segment.color = "orange", segment.alpha = 0.4) +
   geom_point(data = flow_micro_summary2, aes(x = mean_flow, y = mean_micro), alpha = 0.5)
+grouped_by_cell_plot
 ggsave(file = "Plots/Grouped_by_cell_plot.pdf", grouped_by_cell_plot, height = 1.5, width = 2.75)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_5C_bottom.csv", flow_micro_summary2, quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -1124,6 +1174,8 @@ Clade1_scatterplot <- ggplot() + theme(panel.grid.minor = element_blank(), legen
 ggsave("Plots/Clade1_scatterplot.pdf", Clade1_scatterplot, height = 2.1, width = 2.7)
 Clade1_scatterplot
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_7_left.csv", flow_micro_clade1 %>% mutate(panel = "Left"), quote = FALSE, row.names = FALSE)
+
 flow_micro_clade2 <- flow_vs_microscopy %>% filter(virus_label %in% c("YN2013 RBD", "Rs4237 RBD", "Rp3 RBD"))
 Clade2_scatterplot <- ggplot() + theme(panel.grid.minor = element_blank(), legend.position = "top") + 
   labs(x = "Fold ACE2-dependent infection (Flow)", y = "Fold ACE2-dependent infection (Image)") +
@@ -1133,6 +1185,8 @@ Clade2_scatterplot <- ggplot() + theme(panel.grid.minor = element_blank(), legen
   geom_point(data = flow_micro_clade2, aes(x = geomean, y = ratio, color = virus_label, shape = cell_label), alpha = 0.5)
 ggsave("Plots/Clade2_scatterplot.pdf", Clade2_scatterplot, height = 2.1, width = 2.7)
 Clade2_scatterplot
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_7_middle.csv", flow_micro_clade2 %>% mutate(panel = "Middle"), quote = FALSE, row.names = FALSE)
 
 flow_micro_clade3 <- flow_vs_microscopy %>% filter(virus_label %in% c("RhGB01 RBD", "BB9904 RBD", "BM48-31 RBD", "Khosta2 RBD", "Khosta1 RBD", "BtKY72 RBD"))
 Clade3_scatterplot <- ggplot() + theme(panel.grid.minor = element_blank(), legend.position = "top") + 
@@ -1144,10 +1198,12 @@ Clade3_scatterplot <- ggplot() + theme(panel.grid.minor = element_blank(), legen
 ggsave("Plots/Clade3_scatterplot.pdf", Clade3_scatterplot, height = 2.1, width = 2.7)
 Clade3_scatterplot
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_7_right.csv", flow_micro_clade3 %>% mutate(panel = "Right"), quote = FALSE, row.names = FALSE)
+
 ```
 
 ## This is where we test the full-length BtKY72 and Khosta-2 spikes
-```{r}
+```{r full-length BtKY72}
 full_length <- two_color_precombined %>% filter(expt %in% c("Full_length") & pseudovirus_env != "R12")
 
 full_length$red_cells <- full_length$live_singlets * full_length$pct_red / 100
@@ -1215,6 +1271,8 @@ Full_length_plot2 <- ggplot() + theme(axis.text.x.bottom = element_text(angle = 
 Full_length_plot2
 ggsave(file = "Plots/Full_length_plot2.pdf", Full_length_plot2, height = 2.2, width = 3.5)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_5D.csv", chimerics_and_full_length_summary, quote = FALSE, row.names = FALSE)
+
 ```
 
 
@@ -1258,6 +1316,8 @@ Predict_BtKY72_plot <- ggplot() +
   facet_grid(cols = vars(cell_label))
 Predict_BtKY72_plot
 ggsave(file = "Plots/Predict_BtKY72_plot.pdf", Predict_BtKY72_plot, height = 1.4, width = 2.8)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_6B.csv", prd_btky_summary, quote = FALSE, row.names = FALSE)
 ```
 
 
@@ -1298,6 +1358,9 @@ ggsave(file = "Plots/Two_color_ACE2_muts_panel_plot.pdf", Two_color_ACE2_muts_pa
 ggsave(file = "Plots/Two_color_ACE2_muts_panel_plot.png", Two_color_ACE2_muts_panel_plot, height = 2.5, width = 4.5)
 
 ### Hmmm, BtKY72 didn't do much here. Probably since this is all suboptimal Kozak ACE2 cells, which isn't enough to allow BtKY72 infection.
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_10A.csv", two_color_ace2_muts_summary, quote = FALSE, row.names = FALSE)
+
 ```
 
 
@@ -1334,6 +1397,9 @@ ggsave(file = "Plots/singleplex_duplex_ace2_ace2_muts_plot.png", singleplex_dupl
 singleplex_duplex_ace2_ace2_muts_plot
 
 cor(singleplex_duplex_ace2_data$geomean.y, singleplex_duplex_ace2_data$geomean.decto_scaled, method = "pearson")
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_10B.csv", singleplex_duplex_ace2_data, quote = FALSE, row.names = FALSE)
+
 ```
 
 
@@ -1367,6 +1433,8 @@ Flow_ace2muts_faceted
 ggsave(file = "Plots/Flow_ace2muts_faceted.pdf", Flow_ace2muts_faceted, height = 2.75, width = 3.8)
 ggsave(file = "Plots/Flow_ace2muts_faceted.png", Flow_ace2muts_faceted, height = 2.75, width = 3.8)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_10C_left.csv", flow_ace2_muts_summary %>% mutate(panel = "left"), quote = FALSE, row.names = FALSE)
+
 Flow_ace2muts_heatmap <- ggplot() + theme(axis.text.x = element_text(angle = -45, hjust = 0, vjust = 0.5)) + 
   labs(x = NULL, y = NULL, fill = "Fold") +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0.1,  na.value = "grey50", trans = "log10") + 
@@ -1376,6 +1444,8 @@ Flow_ace2muts_heatmap <- ggplot() + theme(axis.text.x = element_text(angle = -45
 ggsave(file = "Plots/Flow_ace2muts_heatmap.pdf", Flow_ace2muts_heatmap, height = 1.6, width = 3.5)
 ggsave(file = "Plots/Flow_ace2muts_heatmap.png", Flow_ace2muts_heatmap, height = 1.6, width = 3.5)
 Flow_ace2muts_heatmap
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_6D.csv", flow_ace2_muts_summary, quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -1397,6 +1467,9 @@ Microscopy_ace2muts_heatmap
 ggsave(file = "Plots/Microscopy_ace2muts_heatmap.pdf", Microscopy_ace2muts_heatmap, height = 1.75, width = 3.25)
 ggsave(file = "Plots/Microscopy_ace2muts_heatmap.png", Microscopy_ace2muts_heatmap, height = 1.75, width = 3.25)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_10D.csv", microscopy_ace2muts_summary %>% mutate(panel = "right"), quote = FALSE, row.names = FALSE)
+
+
 microscopy_ace2muts$cell_label <- factor(microscopy_ace2muts$cell_label, levels = c("H.sapiens", "K31D","Y41A","K353D","D355N","R357T"))
 microscopy_ace2muts$virus_label <- factor(microscopy_ace2muts$virus_label, levels = c("VSV","SARS-CoV-2 RBD", "SARS-CoV", "WIV1 RBD", "Khosta2 RBD","BtKY72 RBD"))
 
@@ -1410,6 +1483,8 @@ Microscopy_ace2muts_faceted <- ggplot() + theme(panel.grid.major.x = element_bla
 Microscopy_ace2muts_faceted
 ggsave(file = "Plots/Microscopy_ace2muts_faceted.pdf", Microscopy_ace2muts_faceted, height = 2.75, width = 3.8)
 ggsave(file = "Plots/Microscopy_ace2muts_faceted.png", Microscopy_ace2muts_faceted, height = 2.75, width = 3.8)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_10C_right.csv", flow_ace2_muts_summary %>% mutate(panel = "right"), quote = FALSE, row.names = FALSE)
 
 ```
 
@@ -1598,6 +1673,7 @@ Bar_chart_flow_btky72 <- ggplot() + labs(x = NULL, y = NULL) +
 Bar_chart_flow_btky72
 ggsave(file = "Plots/Bar_chart_flow_btky72.pdf", Bar_chart_flow_btky72, height = 1.5, width = 2.5)
 
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_7C_bottom.csv", flow_btky72_summary, quote = FALSE, row.names = FALSE)
 
 ## Microscopy next
 
@@ -1629,7 +1705,6 @@ Bar_chart_flowmuts_btky72 <- ggplot() + labs(x = NULL, y = NULL) +
 Bar_chart_flowmuts_btky72
 ggsave(file = "Plots/Bar_chart_flowmuts_btky72.pdf", Bar_chart_flowmuts_btky72, height = 1.1, width = 0.85)
 
-
 ## Microscopy again for the relevant variants
 
 micromuts_btky72 <- microscopy_ace2muts %>% filter(virus_label == "BtKY72 RBD" & cell_label %in% c("H.sapiens", "K31D"))
@@ -1659,6 +1734,8 @@ Bar_chart_flow_khosta1 <- ggplot() + labs(x = NULL, y = NULL) +
   geom_point(data = flow_khosta1_summary, aes(x = cell_label, y = geomean), shape = 95, size = 10)
 Bar_chart_flow_khosta1
 ggsave(file = "Plots/Bar_chart_flow_khosta1.pdf", Bar_chart_flow_khosta1, height = 1.5, width = 2.5)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_7C_top.csv", flow_khosta1_summary, quote = FALSE, row.names = FALSE)
 
 ## Microscopy for Khosta-1
 
@@ -1728,6 +1805,9 @@ Interface_mutants_plot1 <- ggplot() +
   facet_grid(rows = vars(cell_label))
 Interface_mutants_plot1
 ggsave(file = "Plots/Interface_mutants_plot1.pdf", Interface_mutants_plot1, height = 2.2, width = 3)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_7D.csv", flow_ace2_muts_summary_plotting, quote = FALSE, row.names = FALSE)
+
 ```
 
 
@@ -1753,6 +1833,9 @@ ggplot() + #scale_x_continuous(limits = c(-50, 50)) + scale_y_continuous(limits 
 ACE2_receptor_usage_by_sequence_matrix
 
 ggsave(file = "Plots/ACE2_receptor_usage_by_sequence_matrix.pdf", ACE2_receptor_usage_by_sequence_matrix, height = 1.7, width = 3.7)
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/Fig_8.csv", mds_plotting_frame2, quote = FALSE, row.names = FALSE)
+
 
 ```
 
@@ -1784,4 +1867,7 @@ Ratio_dependent_ACE2_infection_plot <- ggplot() + theme(panel.grid.minor = eleme
   geom_point(data = cell_mixing, aes(x = ratio_nir_mcherry, y = fold_ace2_dep_infxn, color = expt), alpha = 0.5)
 ggsave(file = "plots/Ratio_dependent_ACE2_infection_plot.pdf", Ratio_dependent_ACE2_infection_plot, height = 2.5, width = 3)
 Ratio_dependent_ACE2_infection_plot
+
+write.csv(file = "Supp_tables/Export_csv_for_S2_Data/SFig_1.csv", cell_mixing, quote = FALSE, row.names = FALSE)
+
 ```

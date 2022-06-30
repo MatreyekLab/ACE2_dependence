@@ -1,0 +1,131 @@
+cell_label,virus_label,ratio,type
+H.sapiens,BB9904 RBD,1.6952683185,microscopy
+H.sapiens,BM48-31 RBD,1.00020677325,microscopy
+H.sapiens,BtKY72 RBD,3.62544337025,microscopy
+H.sapiens,Khosta1 RBD,1.309871986375,microscopy
+H.sapiens,Khosta2 RBD,4.824754261,microscopy
+H.sapiens,RhGB01 RBD,0.993576243375,microscopy
+H.sapiens,Rp3 RBD,0.910255738875,microscopy
+H.sapiens,Rs4237 RBD,0.9862123335,microscopy
+H.sapiens,SARS-CoV,3.242527288,microscopy
+H.sapiens,SARS-CoV-2 RBD,4.5838100765,microscopy
+H.sapiens,VSV,0.997564416125,microscopy
+H.sapiens,WIV1 RBD,3.109586383,microscopy
+H.sapiens,YN2013 RBD,1.06696395575,microscopy
+NULL (fs),BB9904 RBD,1.01874473775,microscopy
+NULL (fs),BM48-31 RBD,1.225087029625,microscopy
+NULL (fs),BtKY72 RBD,1.034487365,microscopy
+NULL (fs),Khosta1 RBD,1.04732357325,microscopy
+NULL (fs),Khosta2 RBD,1.089489338875,microscopy
+NULL (fs),RhGB01 RBD,0.8573610265,microscopy
+NULL (fs),Rp3 RBD,1.00484016475,microscopy
+NULL (fs),Rs4237 RBD,0.931067308875,microscopy
+NULL (fs),SARS-CoV,1.1138400705,microscopy
+NULL (fs),SARS-CoV-2 RBD,0.998401171375,microscopy
+NULL (fs),VSV,0.853227329,microscopy
+NULL (fs),WIV1 RBD,1.223218850375,microscopy
+NULL (fs),YN2013 RBD,1.205187453,microscopy
+R.affinis,BB9904 RBD,1.1092182765,microscopy
+R.affinis,BM48-31 RBD,0.981325071875,microscopy
+R.affinis,BtKY72 RBD,2.234450142125,microscopy
+R.affinis,Khosta1 RBD,1.59373118825,microscopy
+R.affinis,Khosta2 RBD,1.136118673625,microscopy
+R.affinis,RhGB01 RBD,1.061215737375,microscopy
+R.affinis,Rp3 RBD,1.148687599625,microscopy
+R.affinis,Rs4237 RBD,1.04102678725,microscopy
+R.affinis,SARS-CoV,3.664681366,microscopy
+R.affinis,SARS-CoV-2 RBD,2.260954418625,microscopy
+R.affinis,VSV,0.939487805875,microscopy
+R.affinis,WIV1 RBD,2.38452812225,microscopy
+R.affinis,YN2013 RBD,1.344207385125,microscopy
+R.alcyone,BB9904 RBD,4.600055658875,microscopy
+R.alcyone,BM48-31 RBD,4.009156832625,microscopy
+R.alcyone,BtKY72 RBD,5.033742430375,microscopy
+R.alcyone,Khosta1 RBD,6.097952907125,microscopy
+R.alcyone,Khosta2 RBD,6.788265397375,microscopy
+R.alcyone,RhGB01 RBD,3.520067404375,microscopy
+R.alcyone,Rp3 RBD,1.21265241575,microscopy
+R.alcyone,Rs4237 RBD,1.445776929875,microscopy
+R.alcyone,SARS-CoV,4.45088677325,microscopy
+R.alcyone,SARS-CoV-2 RBD,4.59419082125,microscopy
+R.alcyone,VSV,0.879458087125,microscopy
+R.alcyone,WIV1 RBD,4.0636559715,microscopy
+R.alcyone,YN2013 RBD,2.8956819855,microscopy
+R.ferrumequinum,BB9904 RBD,1.031237491125,microscopy
+R.ferrumequinum,BM48-31 RBD,1.043504042625,microscopy
+R.ferrumequinum,BtKY72 RBD,2.1224025845,microscopy
+R.ferrumequinum,Khosta1 RBD,1.33152709475,microscopy
+R.ferrumequinum,Khosta2 RBD,1.067352077125,microscopy
+R.ferrumequinum,RhGB01 RBD,1.016127261,microscopy
+R.ferrumequinum,Rp3 RBD,1.065657114,microscopy
+R.ferrumequinum,Rs4237 RBD,1.034019838125,microscopy
+R.ferrumequinum,SARS-CoV,1.1168904675,microscopy
+R.ferrumequinum,SARS-CoV-2 RBD,1.05354334925,microscopy
+R.ferrumequinum,VSV,1.058581236125,microscopy
+R.ferrumequinum,WIV1 RBD,1.137029056375,microscopy
+R.ferrumequinum,YN2013 RBD,1.133047207875,microscopy
+R.landeri,BB9904 RBD,4.20877770675,microscopy
+R.landeri,BM48-31 RBD,1.44389377825,microscopy
+R.landeri,BtKY72 RBD,3.42842004475,microscopy
+R.landeri,Khosta1 RBD,4.53629505875,microscopy
+R.landeri,Khosta2 RBD,1.319402693875,microscopy
+R.landeri,RhGB01 RBD,1.119642397,microscopy
+R.landeri,Rp3 RBD,1.11586038025,microscopy
+R.landeri,Rs4237 RBD,1.54702847375,microscopy
+R.landeri,SARS-CoV,4.258240818,microscopy
+R.landeri,SARS-CoV-2 RBD,4.344322575875,microscopy
+R.landeri,VSV,0.85254671575,microscopy
+R.landeri,WIV1 RBD,2.57025448175,microscopy
+R.landeri,YN2013 RBD,1.221712293625,microscopy
+R.pearsonii,BB9904 RBD,1.07718116925,microscopy
+R.pearsonii,BM48-31 RBD,1.08643912375,microscopy
+R.pearsonii,BtKY72 RBD,1.28125998,microscopy
+R.pearsonii,Khosta1 RBD,1.054077807375,microscopy
+R.pearsonii,Khosta2 RBD,1.206029655625,microscopy
+R.pearsonii,RhGB01 RBD,1.056725612375,microscopy
+R.pearsonii,Rp3 RBD,1.04498967725,microscopy
+R.pearsonii,Rs4237 RBD,1.073627248375,microscopy
+R.pearsonii,SARS-CoV,1.00057055975,microscopy
+R.pearsonii,SARS-CoV-2 RBD,1.037823519125,microscopy
+R.pearsonii,VSV,0.873357161625,microscopy
+R.pearsonii,WIV1 RBD,3.347594083625,microscopy
+R.pearsonii,YN2013 RBD,1.01616301425,microscopy
+R.sinicus200,BB9904 RBD,1.314523033375,microscopy
+R.sinicus200,BM48-31 RBD,1.139697036125,microscopy
+R.sinicus200,BtKY72 RBD,1.910612692,microscopy
+R.sinicus200,Khosta1 RBD,2.107831751125,microscopy
+R.sinicus200,Khosta2 RBD,1.46425307075,microscopy
+R.sinicus200,RhGB01 RBD,1.008872166625,microscopy
+R.sinicus200,Rp3 RBD,1.06525678025,microscopy
+R.sinicus200,Rs4237 RBD,1.11498760875,microscopy
+R.sinicus200,SARS-CoV,2.92983163825,microscopy
+R.sinicus200,SARS-CoV-2 RBD,1.05369725075,microscopy
+R.sinicus200,VSV,0.94888427675,microscopy
+R.sinicus200,WIV1 RBD,2.17703137325,microscopy
+R.sinicus200,YN2013 RBD,1.287830163375,microscopy
+R.sinicus215,BB9904 RBD,1.184863343625,microscopy
+R.sinicus215,BM48-31 RBD,1.17161356675,microscopy
+R.sinicus215,BtKY72 RBD,4.9761765975,microscopy
+R.sinicus215,Khosta1 RBD,2.35750056275,microscopy
+R.sinicus215,Khosta2 RBD,1.035307965125,microscopy
+R.sinicus215,RhGB01 RBD,1.03560300325,microscopy
+R.sinicus215,Rp3 RBD,1.002869409875,microscopy
+R.sinicus215,Rs4237 RBD,1.22412945425,microscopy
+R.sinicus215,SARS-CoV,5.3718102535,microscopy
+R.sinicus215,SARS-CoV-2 RBD,1.339433087125,microscopy
+R.sinicus215,VSV,0.88464121425,microscopy
+R.sinicus215,WIV1 RBD,5.666517634375,microscopy
+R.sinicus215,YN2013 RBD,1.46416011775,microscopy
+R.sinicus472,BB9904 RBD,1.24134635225,microscopy
+R.sinicus472,BM48-31 RBD,1.465664730875,microscopy
+R.sinicus472,BtKY72 RBD,1.020593011875,microscopy
+R.sinicus472,Khosta1 RBD,0.970402526375,microscopy
+R.sinicus472,Khosta2 RBD,1.072451250375,microscopy
+R.sinicus472,RhGB01 RBD,1.048308434875,microscopy
+R.sinicus472,Rp3 RBD,0.965857629875,microscopy
+R.sinicus472,Rs4237 RBD,1.0532165285,microscopy
+R.sinicus472,SARS-CoV,1.7980042715,microscopy
+R.sinicus472,SARS-CoV-2 RBD,1.319007579625,microscopy
+R.sinicus472,VSV,0.95878576875,microscopy
+R.sinicus472,WIV1 RBD,1.177825181,microscopy
+R.sinicus472,YN2013 RBD,1.08378278375,microscopy
