@@ -1508,7 +1508,7 @@ ggsave(file = "Plots/flow_vs_microscopy_ace2muts_scatterplot.png", flow_vs_micro
 ```
 
 ### Trying to incorporate the bat species range data
-```{r Incorporating the bat species range data, warning=FALSE}
+```{r Bringing in the base world map for the bat species range data, warning=FALSE}
 ## https://r-spatial.github.io/sf/reference/st_read.html
 ## https://www.r-graph-gallery.com/168-load-a-shape-file-into-r.html
 ## https://cfss.uchicago.edu/notes/simple-features/
@@ -1524,7 +1524,7 @@ ggsave(file = "Plots/flow_vs_microscopy_ace2muts_scatterplot.png", flow_vs_micro
 #install.packages("broom")
 #library(broom)
 
-world_shape <- here("Data/Maps/TM_WORLD_BORDERS-0.3/TM_WORLD_BORDERS-0.3.shp") %>% st_read()
+world_shape <- here("Data/Maps/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp") %>% st_read()
 
 base_world_map_ggplot <- ggplot() + theme_bw() + 
   theme(axis.text = element_blank(), panel.grid.major = element_blank(), axis.ticks = element_blank()) +
@@ -1532,9 +1532,12 @@ base_world_map_ggplot <- ggplot() + theme_bw() +
   geom_sf(data = world_shape, fill="grey95", color="black",size = 0.1) +
   coord_sf(xlim = c(-12, 145), ylim = c(-19, 60), expand = T) +
   NULL
+base_world_map_ggplot
 ggsave(file = "Plots/Base_world_map_ggplot.pdf", base_world_map_ggplot, height = 1.5, width = 4)
-#base_world_map_ggplot
+```
 
+
+```{r Incorporating the bat species range data, warning=FALSE}
 ferrum_shape <- here("Data/Maps/ferrumequinum_redlist_species_data_8e16dc36-7b4b-44b9-9840-799c4a0f6a53/data_0.shp") %>% st_read()
 ferrum_map_plot <- base_world_map_ggplot + geom_sf(data = ferrum_shape, fill="red", alpha = 0.4, size = 0.2) + 
   coord_sf(xlim = c(-12, 145), ylim = c(-19, 60), expand = T)
